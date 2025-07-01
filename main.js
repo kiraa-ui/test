@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  fetch('http://localhost:8000/api/users')
+  fetch('https://rifkira.psl17.my.id//api/users')
     .then(res => res.json())
     .then(users => {
       const userTable = document.getElementById('userTable');
