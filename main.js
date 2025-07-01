@@ -1,9 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
-  fetch('https://rifkira.psl17.my.id//api/users')
+  fetch('https://rifkira.psl17.my.id/api/users', {
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('token') // jika pakai token
+    }
+  })
     .then(res => res.json())
     .then(users => {
+      console.log("📦 Data pengguna:", users);
+
       const userTable = document.getElementById('userTable');
-      userTable.innerHTML = ''; // Bersihkan sebelum render
+      userTable.innerHTML = '';
+
+      if (!Array.isArray(users)) {
+        userTable.innerHTML = `<tr><td colspan="3" class="text-center text-red-600 py-2">Data tidak tersedia</td></tr>`;
+        return;
+      }
+
       users.forEach(user => {
         userTable.innerHTML += `
           <tr class="hover:bg-gray-50">
@@ -16,5 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       });
     })
-    .catch(err => console.error('Gagal mengambil data pengguna:', err));
+    .catch(err => {
+      console.error('Gagal mengambil data pengguna:', err);
+      const userTable = document.getElementById('userTable');
+      userTable.innerHTML = `<tr><td colspan="3" class="text-center text-red-600 py-2">Terjadi kesalahan saat mengambil data</td></tr>`;
+    });
 });
