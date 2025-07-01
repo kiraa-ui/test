@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Produk</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(120deg, #fff1f5, #fcd5ce, #f9e2f4);
+      background-size: 150% 150%;
+      animation: bgFlow 25s infinite alternate;
+    }
+
+    @keyframes bgFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: appear 0.9s ease forwards;
+    }
+  </style>
+</head>
+<body class="text-gray-700">
+
+  <header class="bg-white/70 backdrop-blur sticky top-0 shadow-md z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-3xl font-bold text-rose-600">🌸 Punya Rahma</h1>
+      <a href="login.html" class="bg-rose-100 hover:bg-rose-200 text-rose-600 px-4 py-1 rounded-full font-semibold transition">Logout</a>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-12">
+    <h2 class="text-5xl font-bold text-center text-rose-600 mb-14 fade-in">✨ Koleksi Yang Ada Di API ✨</h2>
+    <div id="produkList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 fade-in">
+      <!-- Produk akan dimuat dari JS -->
+    </div>
+  </main>
+
+  <script src="https://rifkira.psl17.my.id/js/app.js"></script>
+</body>
+</html>
