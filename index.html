@@ -33,7 +33,10 @@
   <header class="bg-white/70 backdrop-blur sticky top-0 shadow-md z-50">
     <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
       <h1 class="text-3xl font-bold text-rose-600">🌸 Punya Rahma</h1>
-      <a href="login.html" class="bg-rose-100 hover:bg-rose-200 text-rose-600 px-4 py-1 rounded-full font-semibold transition">Logout</a>
+      <div class="flex gap-4">
+        <button onclick="openModal('addModal')" class="bg-rose-500 text-white px-5 py-2 rounded-full font-semibold hover:bg-rose-600 transition">+ Tambah Produk</button>
+        <a href="login.html" class="bg-rose-100 hover:bg-rose-200 text-rose-600 px-4 py-1 rounded-full font-semibold transition">Logout</a>
+      </div>
     </div>
   </header>
 
@@ -48,10 +51,59 @@
     </div>
 
     <div id="produkList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 fade-in">
-      <!-- Produk akan dimuat dari JS -->
+      <!-- Produk dimuat lewat JS -->
     </div>
   </main>
 
+  <!-- Modal Tambah Produk -->
+  <div id="addModal" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center">
+    <div class="bg-white p-8 rounded-2xl w-full max-w-lg shadow-lg relative">
+      <button onclick="closeModal('addModal')" class="absolute top-4 right-4 text-gray-500 hover:text-red-500">&times;</button>
+      <h3 class="text-2xl font-bold text-rose-600 mb-6">Tambah Produk</h3>
+      <form id="addProductForm" enctype="multipart/form-data" class="space-y-4">
+        <input name="name" placeholder="Nama Produk" required class="w-full border px-4 py-2 rounded" />
+        <input name="description" placeholder="Deskripsi" class="w-full border px-4 py-2 rounded" />
+        <input name="price" type="number" placeholder="Harga" required class="w-full border px-4 py-2 rounded" />
+        <input name="size" placeholder="Ukuran" class="w-full border px-4 py-2 rounded" />
+        <input name="color" placeholder="Warna" class="w-full border px-4 py-2 rounded" />
+        <input name="category" placeholder="Kategori" class="w-full border px-4 py-2 rounded" />
+        <input name="image" type="file" accept="image/*" class="w-full border px-4 py-2 rounded" required />
+        <p id="addProductResponse" class="text-sm text-red-500"></p>
+        <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white font-semibold px-6 py-2 rounded-xl">Tambah</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Edit Produk (dapat di-clone saat load data) -->
+  <div id="editModal" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center">
+    <div class="bg-white p-8 rounded-2xl w-full max-w-lg shadow-lg relative">
+      <button onclick="closeModal('editModal')" class="absolute top-4 right-4 text-gray-500 hover:text-red-500">&times;</button>
+      <h3 class="text-2xl font-bold text-rose-600 mb-6">Edit Produk</h3>
+      <form id="editProductForm" enctype="multipart/form-data" class="space-y-4">
+        <input type="hidden" name="id" />
+        <input name="name" placeholder="Nama Produk" required class="w-full border px-4 py-2 rounded" />
+        <input name="description" placeholder="Deskripsi" class="w-full border px-4 py-2 rounded" />
+        <input name="price" type="number" placeholder="Harga" required class="w-full border px-4 py-2 rounded" />
+        <input name="size" placeholder="Ukuran" class="w-full border px-4 py-2 rounded" />
+        <input name="color" placeholder="Warna" class="w-full border px-4 py-2 rounded" />
+        <input name="category" placeholder="Kategori" class="w-full border px-4 py-2 rounded" />
+        <input name="image" type="file" accept="image/*" class="w-full border px-4 py-2 rounded" />
+        <p id="editProductResponse" class="text-sm text-red-500"></p>
+        <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white font-semibold px-6 py-2 rounded-xl">Update</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+      document.getElementById(id).classList.add('flex');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('flex');
+      document.getElementById(id).classList.add('hidden');
+    }
+  </script>
   <script src="https://rifkira.psl17.my.id/js/app.js"></script>
 </body>
 </html>
