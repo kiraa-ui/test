@@ -4,6 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Produk</title>
+    <script>
+    (function () {
+      const path = window.location.pathname;
+      const lastPart = path.endsWith('/') ? 'index.html' : path.split('/').pop();
+      const isIndex = lastPart === 'index.html';
+
+      const token = localStorage.getItem('token');
+
+      if (isIndex && !token) {
+        alert('Silakan login terlebih dahulu');
+        window.location.replace('login.html');
+      }
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://rifkira.psl17.my.id/js/app.js" defer></script>
   <style>
