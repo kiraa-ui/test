@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://rifkira.psl17.my.id/js/app.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -53,5 +52,46 @@
       </button>
     </form>
   </div>
+
+  <script>
+    const API_URL = 'https://rifkira.psl17.my.id/api';
+
+    // Redirect ke dashboard jika sudah login admin
+    const token = localStorage.getItem('token');
+    const email = localStorage.getItem('email');
+    if (token && email === 'admin@mail.com') {
+      window.location.href = 'dashboard.html';
+    }
+
+    const form = document.getElementById('loginForm');
+    const responseText = document.getElementById('response');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+
+      try {
+        const res = await fetch(`${API_URL}/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem('token', result.token);
+          localStorage.setItem('email', 'admin@mail.com');
+          window.location.href = 'dashboard.html';
+        } else {
+          responseText.textContent = result.error || 'Login gagal. Periksa kembali data Anda.';
+        }
+      } catch (err) {
+        responseText.textContent = 'Terjadi kesalahan: ' + err.message;
+      }
+    });
+  </script>
 </body>
 </html>
