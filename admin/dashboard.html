@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Admin - Produk</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#f472b6',
+            secondary: '#fef3c7',
+            dark: '#9d174d',
+          },
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+          },
+          animation: {
+            fade: 'fadeIn 1s ease-in-out',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    .btn-hover {
+      transition: all 0.3s ease-in-out;
+    }
+    .btn-hover:hover {
+      transform: scale(1.05);
+      background-color: #f472b6;
+      color: white;
+    }
+    .modal {
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-rose-100 via-pink-200 to-rose-300 min-h-screen">
+
+  <header class="sticky top-0 z-50 bg-white/70 backdrop-blur-md shadow-md p-4 flex justify-between items-center animate-fade">
+    <h1 class="text-2xl font-bold text-rose-700">Admin Dashboard</h1>
+    <button onclick="logout()" class="text-sm text-white bg-rose-500 hover:bg-rose-600 rounded-full px-4 py-2 btn-hover">Logout</button>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-10 animate-fade">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-rose-800">Manajemen Produk</h2>
+      <button onclick="openModal('addModal')" class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg btn-hover">
+        + Tambah Produk
+      </button>
+    </div>
+
+    <div id="produkList" class="grid sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+  </main>
+
+  <!-- Modal Tambah Produk -->
+  <div id="addModal" class="fixed inset-0 z-50 hidden items-center justify-center modal">
+    <div class="bg-white rounded-xl p-6 max-w-xl w-full relative animate-fade">
+      <button onclick="closeModal('addModal')" class="absolute top-2 right-2 text-rose-500 font-bold">&times;</button>
+      <h3 class="text-lg font-semibold text-rose-700 mb-4">Tambah Produk</h3>
+      <form id="addProductForm" class="space-y-4">
+        <input type="text" name="name" placeholder="Nama Produk" class="w-full p-3 rounded-lg shadow border border-rose-200" required>
+        <textarea name="description" placeholder="Deskripsi" class="w-full p-3 rounded-lg shadow border border-rose-200" required></textarea>
+        <input type="number" name="price" placeholder="Harga" class="w-full p-3 rounded-lg shadow border border-rose-200" required>
+        <input type="text" name="size" placeholder="Ukuran" class="w-full p-3 rounded-lg shadow border border-rose-200">
+        <input type="text" name="color" placeholder="Warna" class="w-full p-3 rounded-lg shadow border border-rose-200">
+        <input type="text" name="category" placeholder="Kategori" class="w-full p-3 rounded-lg shadow border border-rose-200">
+        <input type="file" name="image" class="w-full p-3 rounded-lg shadow border border-rose-200">
+        <div id="addProductResponse" class="text-sm text-rose-500"></div>
+        <button class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg btn-hover" type="submit">
+          Simpan Produk
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Edit Produk -->
+  <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center modal">
+    <div class="bg-white rounded-xl p-6 max-w-xl w-full relative animate-fade">
+      <button onclick="closeModal('editModal')" class="absolute top-2 right-2 text-rose-500 font-bold">&times;</button>
+      <h3 class="text-lg font-semibold text-rose-700 mb-4">Edit Produk</h3>
+      <form id="editProductForm" class="space-y-4">
+        <input type="hidden" name="id">
+        <input type="text" name="name" placeholder="Nama Produk" class="w-full p-3 rounded-lg shadow border border-rose-200" required>
+        <textarea name="description" placeholder="Deskripsi" class="w-full p-3 rounded-lg shadow border border-rose-200" required></textarea>
+        <input type="number" name="price" placeholder="Harga" class="w-full p-3 rounded-lg shadow border border-rose-200" required>
+        <input type="text" name="size" placeholder="Ukuran" class="w-full p-3 rounded-lg shadow border border-rose-200">
+        <input type="text" name="color" placeholder="Warna" class="w-full p-3 rounded-lg shadow border border-rose-200">
+        <input type="text" name="category" placeholder="Kategori" class="w-full p-3 rounded-lg shadow border border-rose-200">
+        <input type="file" name="image" class="w-full p-3 rounded-lg shadow border border-rose-200">
+        <div id="editProductResponse" class="text-sm text-rose-500"></div>
+        <button class="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-3 rounded-full font-semibold shadow-lg btn-hover" type="submit">
+          Update Produk
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="bg-white/80 backdrop-blur-md text-center text-sm text-rose-500 py-6 shadow-inner animate-fade">
+    &copy; 2025 Bellenshop. All rights reserved.
+  </footer>
+
+  <script>
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+      document.getElementById(id).classList.add('flex');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('flex');
+      document.getElementById(id).classList.add('hidden');
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
