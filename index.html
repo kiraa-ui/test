@@ -39,6 +39,14 @@
 
   <main class="max-w-7xl mx-auto px-4 py-12">
     <h2 class="text-5xl font-bold text-center text-rose-600 mb-14 fade-in">✨ Koleksi Yang Ada Di API ✨</h2>
+    <div class="text-center mb-10 fade-in">
+      <input id="couponInput" type="text" placeholder="Masukkan kode kupon..."
+        class="px-5 py-3 rounded-xl bg-white/70 border border-rose-300 focus:ring-2 focus:ring-rose-400 placeholder-rose-400 outline-none text-lg" />
+      <button onclick="loadProduk()" class="ml-2 px-5 py-3 rounded-xl bg-rose-500 text-white font-semibold hover:bg-rose-600 transition">
+        Terapkan
+      </button>
+    </div>
+
     <div id="produkList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 fade-in">
       <!-- Produk akan dimuat dari JS -->
     </div>
