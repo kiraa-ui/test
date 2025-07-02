@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>E-Commerce Bellenshop - Index</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://rifkira.psl17.my.id/js/app.js"></script>
   <script>
   // Blokir admin agar tidak bisa mengakses index.html
   const email = localStorage.getItem('email');
@@ -148,6 +147,61 @@ function logout() {
 }
 
 </script>
-  <script src="app.js"></script>
+<script>
+  const API_URL = 'https://rifkira.psl17.my.id/api';
+
+  // Blokir pengguna yang belum login
+  if (!token) {
+    window.location.href = 'login.html';
+  }
+
+  // Load Produk dari API
+  async function loadProduk() {
+    const produkList = document.getElementById('produkList');
+    produkList.innerHTML = '<p class="text-center text-rose-400 col-span-full">Memuat produk...</p>';
+
+    try {
+      const res = await fetch(`${API_URL}/products`, {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+      });
+      const data = await res.json();
+
+      if (!Array.isArray(data) || data.length === 0) {
+        produkList.innerHTML = '<p class="text-center text-gray-500 col-span-full">Belum ada produk tersedia.</p>';
+        return;
+      }
+
+      produkList.innerHTML = data.map(p => `
+        <div class="bg-white/80 backdrop-blur-md p-4 rounded-3xl shadow card-hover transition relative">
+          <img src="${p.image_url ? API_URL.replace('/api', '') + p.image_url : 'https://via.placeholder.com/300'}"
+               alt="${p.name}" class="w-full h-48 object-cover rounded-xl border border-rose-200 mb-3" />
+          <h3 class="text-lg font-bold text-rose-700">${p.name}</h3>
+          <p class="text-sm text-gray-500">${p.description}</p>
+
+          ${p.discount_percentage ? `
+            <p class="line-through text-sm text-gray-400 mt-1">Rp${Number(p.original_price).toLocaleString('id-ID')}</p>
+            <p class="text-rose-600 font-bold text-lg">Rp${Number(p.final_price).toLocaleString('id-ID')} 
+              <span class="text-sm bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full ml-1">${p.discount_percentage}% OFF</span>
+            </p>
+          ` : `
+            <p class="text-gray-800 font-bold text-lg mt-1">Rp${Number(p.price).toLocaleString('id-ID')}</p>
+          `}
+
+          <div class="mt-2 text-xs text-gray-500">
+            <p>Ukuran: ${p.size || '-'}</p>
+            <p>Warna: ${p.color || '-'}</p>
+            <p>Kategori: ${p.category || '-'}</p>
+          </div>
+        </div>
+      `).join('');
+    } catch (err) {
+      produkList.innerHTML = `<p class="text-red-500 col-span-full">Gagal memuat produk: ${err.message}</p>`;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadProduk);
+</script>
 </body>
 </html>
