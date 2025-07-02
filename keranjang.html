@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Keranjang Belanja - Bellenshop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#f472b6',
+            dark: '#9d174d',
+          },
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+          },
+          animation: {
+            fade: 'fadeIn 1s ease-in-out',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    .btn-hover {
+      transition: all 0.3s ease-in-out;
+    }
+    .btn-hover:hover {
+      transform: scale(1.05);
+      background-color: #f472b6;
+      color: white;
+    }
+    .qty-input {
+      width: 60px;
+      padding: 5px;
+      border-radius: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-rose-100 via-pink-200 to-rose-300 min-h-screen">
+
+  <header id="mainHeader" class="sticky top-0 z-50 bg-white/70 backdrop-blur-lg shadow-md p-4 flex items-center justify-between animate-fade">
+    <!-- Akan diganti via JS -->
+  </header>
+
+
+  <main class="max-w-5xl mx-auto px-4 py-10 animate-fade">
+    <h2 class="text-3xl font-bold text-rose-800 mb-6">Keranjang Saya</h2>
+    <div id="cartContainer" class="space-y-6">
+      <p class="text-center text-rose-500 animate-pulse">Memuat keranjang...</p>
+    </div>
+
+    <div id="subtotalContainer" class="text-right mt-10 text-lg font-semibold text-rose-700 hidden">
+      Subtotal: <span id="subtotalAmount">Rp0</span>
+      <br />
+      <a id="checkoutBtn" target="_blank"
+         class="inline-block mt-4 bg-pink-500 text-white px-6 py-3 rounded-full shadow-lg btn-hover">Checkout via WhatsApp</a>
+    </div>
+  </main>
+
+  <footer class="bg-white/80 backdrop-blur-md text-center text-sm text-rose-500 py-6 shadow-inner animate-fade">
+    &copy; 2025 Bellenshop. All rights reserved.
+  </footer>
+  <script>
+  const header = document.getElementById('mainHeader');
+  const token = localStorage.getItem('token');
+
+  if (token) {
+    header.innerHTML = `
+      <h1 class="text-2xl font-bold text-rose-700">Bellenshop</h1>
+      <nav class="flex gap-4 text-rose-600 font-medium">
+        <a href="index.html" class="nav-hover">Home</a>
+        <a href="keranjang.html" class="nav-hover">Keranjang</a>
+        <a href="wishlist.html" class="nav-hover">Favorit</a>
+        <a href="tentang.html" class="nav-hover">Tentang</a>
+        <button onclick="logout()" class="nav-hover text-red-500">Logout</button>
+      </nav>
+    `;
+  } else {
+    header.innerHTML = `
+      <h1 class="text-2xl font-bold text-rose-700">Bellenshop</h1>
+      <nav class="flex gap-4 text-rose-600 font-medium">
+        <a href="index.html" class="nav-hover">Home</a>
+        <a href="tentang.html" class="nav-hover">Tentang</a>
+        <a href="login.html" class="nav-hover">Login</a>
+        <a href="register.html" class="nav-hover">Register</a>
+      </nav>
+    `;
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    alert('Anda telah logout.');
+    window.location.href = 'login.html';
+  }
+</script>
+  <script>
+    const API_URL = 'https://rifkira.psl17.my.id/api';
+    const cartContainer = document.getElementById('cartContainer');
+    const subtotalAmount = document.getElementById('subtotalAmount');
+    const subtotalContainer = document.getElementById('subtotalContainer');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+
+    async function loadKeranjang() {
+      try {
+        const res = await fetch(`${API_URL}/cart`, {
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          }
+        });
+
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          cartContainer.innerHTML = '<p class="text-center text-gray-500">Keranjang kamu kosong.</p>';
+          subtotalContainer.classList.add('hidden');
+          return;
+        }
+
+        let total = 0;
+        let pesanWA = `Halo, saya ingin memesan:%0A`;
+
+        cartContainer.innerHTML = data.map(item => {
+          const harga = item.harga_setelah_diskon || item.harga;
+          const subtotal = harga * item.qty;
+          total += subtotal;
+
+          pesanWA += `- ${item.nama} (${item.qty}x) - Rp${subtotal.toLocaleString('id-ID')}\n`;
+
+          return `
+            <div class="bg-white/80 p-5 rounded-3xl shadow-md flex flex-col md:flex-row gap-4 items-center">
+              <img src="${item.gambar ? API_URL.replace('/api', '') + item.gambar : 'https://via.placeholder.com/150'}"
+                class="w-32 h-32 object-cover rounded-xl border border-rose-100" alt="${item.nama}" />
+              <div class="flex-1">
+                <h3 class="text-xl font-semibold text-rose-800">${item.nama}</h3>
+                <p class="text-sm text-gray-600">${item.kategori || ''}</p>
+                <p class="text-sm text-gray-600">Ukuran: ${item.ukuran || '-'}</p>
+                <div class="flex items-center gap-2 mt-1">
+                  <label>Jumlah:</label>
+                  <input type="number" min="1" value="${item.qty}" class="qty-input border border-pink-300"
+                    onchange="updateQty(${item.id}, this.value)" />
+                </div>
+                <p class="text-sm mt-1">Harga: Rp${harga.toLocaleString('id-ID')}</p>
+              </div>
+              <div class="flex flex-col items-end gap-2">
+                <div class="font-bold text-rose-700 text-lg">Rp${subtotal.toLocaleString('id-ID')}</div>
+                <button onclick="hapusItem(${item.id})"
+                        class="text-sm bg-red-400 hover:bg-red-500 text-white px-4 py-1 rounded-full">Hapus</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        subtotalContainer.classList.remove('hidden');
+        subtotalAmount.textContent = 'Rp' + total.toLocaleString('id-ID');
+        pesanWA += `\nTotal: Rp${total.toLocaleString('id-ID')}`;
+        checkoutBtn.href = `https://wa.me/6281234567890?text=${encodeURIComponent(pesanWA)}`;
+
+      } catch (err) {
+        cartContainer.innerHTML = `<p class="text-red-500">Gagal memuat keranjang: ${err.message}</p>`;
+      }
+    }
+
+    async function hapusItem(id) {
+      if (!confirm('Yakin ingin menghapus item ini?')) return;
+      try {
+        await fetch(`${API_URL}/cart/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          }
+        });
+        loadKeranjang();
+      } catch (err) {
+        alert('Gagal menghapus item: ' + err.message);
+      }
+    }
+
+    async function updateQty(id, qty) {
+      try {
+        await fetch(`${API_URL}/cart/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ qty: parseInt(qty) })
+        });
+        loadKeranjang();
+      } catch (err) {
+        alert('Gagal memperbarui jumlah: ' + err.message);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadKeranjang);
+  </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Commerce Beauty - Index</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#f472b6',
+            secondary: '#fef3c7',
+            dark: '#9d174d',
+          },
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+          },
+          animation: {
+            fade: 'fadeIn 1s ease-in-out',
+            bounceSlow: 'bounce 2s infinite',
+            pulseSoft: 'pulse 2.5s infinite ease-in-out',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+          },
+          scale: {
+            '102': '1.02',
+            '105': '1.05',
+          }
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 20px rgba(244, 114, 182, 0.25);
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+    .nav-hover {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 2px;
+      color: #9d174d;
+      transition: all 0.4s ease-in-out;
+    }
+    .nav-hover::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      border-radius: 12px;
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.2);
+      opacity: 0;
+      transition: all 0.3s ease-in-out;
+      z-index: -1;
+    }
+    .nav-hover:hover::before {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+    .nav-hover:hover {
+      color: #be185d;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-rose-100 via-pink-200 to-rose-300 min-h-screen overflow-x-hidden">
+
+  <!-- Header (Akan disesuaikan berdasarkan login) -->
+  <header id="mainHeader" class="sticky top-0 z-50 bg-white/70 backdrop-blur-lg shadow-md p-4 flex items-center justify-between animate-fade">
+    <!-- Akan diganti via JS -->
+  </header>
+
+  <!-- Hero Section -->
+  <section class="text-center py-16 animate-fade">
+    <h2 class="text-4xl md:text-5xl font-extrabold text-rose-800 leading-tight">Produk Kecantikan Wanita</h2>
+    <p class="text-lg text-rose-600 mt-3">Dapatkan diskon hingga 50% + kupon eksklusif!</p>
+  </section>
+
+  <!-- Produk List -->
+  <main class="px-6 md:px-16 pb-16 animate-fade">
+    <div id="produkList" class="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+      <!-- Produk akan dimuat di sini -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white/80 backdrop-blur-md text-center text-sm text-rose-500 py-6 shadow-inner animate-fade">
+    &copy; 2025 Bellenshop. All rights reserved.
+  </footer>
+
+  <script>
+  const header = document.getElementById('mainHeader');
+  const token = localStorage.getItem('token');
+
+  if (token) {
+    header.innerHTML = `
+      <h1 class="text-2xl font-bold text-rose-700">Bellenshop</h1>
+      <nav class="flex gap-4 text-rose-600 font-medium">
+        <a href="index.html" class="nav-hover">Home</a>
+        <a href="keranjang.html" class="nav-hover">Keranjang</a>
+        <a href="wishlist.html" class="nav-hover">Favorit</a>
+        <a href="tentang.html" class="nav-hover">Tentang</a>
+        <button onclick="logout()" class="nav-hover text-red-500">Logout</button>
+      </nav>
+    `;
+  } else {
+    header.innerHTML = `
+      <h1 class="text-2xl font-bold text-rose-700">Bellenshop</h1>
+      <nav class="flex gap-4 text-rose-600 font-medium">
+        <a href="index.html" class="nav-hover">Home</a>
+        <a href="tentang.html" class="nav-hover">Tentang</a>
+        <a href="login.html" class="nav-hover">Login</a>
+        <a href="register.html" class="nav-hover">Register</a>
+      </nav>
+    `;
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    alert('Anda telah logout.');
+    window.location.href = 'login.html';
+  }
+</script>
+  <script src="app.js"></script>
+</body>
+</html>
