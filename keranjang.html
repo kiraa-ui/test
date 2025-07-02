@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Keranjang Belanja - Bellenshop</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://rifkira.psl17.my.id/js/app.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -48,15 +47,21 @@
       border-radius: 10px;
       text-align: center;
     }
+    .nav-hover {
+      transition: all 0.3s ease-in-out;
+    }
+    .nav-hover:hover {
+      color: #be185d;
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-rose-100 via-pink-200 to-rose-300 min-h-screen">
 
-  <header id="mainHeader" class="sticky top-0 z-50 bg-white/70 backdrop-blur-lg shadow-md p-4 flex items-center justify-between animate-fade">
-    <!-- Akan diganti via JS -->
-  </header>
+  <!-- Header -->
+  <header id="mainHeader" class="sticky top-0 z-50 bg-white/70 backdrop-blur-lg shadow-md p-4 flex items-center justify-between animate-fade"></header>
 
-
+  <!-- Main -->
   <main class="max-w-5xl mx-auto px-4 py-10 animate-fade">
     <h2 class="text-3xl font-bold text-rose-800 mb-6">Keranjang Saya</h2>
     <div id="cartContainer" class="space-y-6">
@@ -71,44 +76,48 @@
     </div>
   </main>
 
+  <!-- Footer -->
   <footer class="bg-white/80 backdrop-blur-md text-center text-sm text-rose-500 py-6 shadow-inner animate-fade">
     &copy; 2025 Bellenshop. All rights reserved.
   </footer>
-  <script>
-  const header = document.getElementById('mainHeader');
-  const token = localStorage.getItem('token');
 
-  if (token) {
-    header.innerHTML = `
-      <h1 class="text-2xl font-bold text-rose-700">Bellenshop</h1>
-      <nav class="flex gap-4 text-rose-600 font-medium">
-        <a href="index.html" class="nav-hover">Home</a>
-        <a href="keranjang.html" class="nav-hover">Keranjang</a>
-        <a href="wishlist.html" class="nav-hover">Favorit</a>
-        <a href="tentang.html" class="nav-hover">Tentang</a>
-        <button onclick="logout()" class="nav-hover text-red-500">Logout</button>
-      </nav>
-    `;
-  } else {
-    header.innerHTML = `
-      <h1 class="text-2xl font-bold text-rose-700">Bellenshop</h1>
-      <nav class="flex gap-4 text-rose-600 font-medium">
-        <a href="index.html" class="nav-hover">Home</a>
-        <a href="tentang.html" class="nav-hover">Tentang</a>
-        <a href="login.html" class="nav-hover">Login</a>
-        <a href="register.html" class="nav-hover">Register</a>
-      </nav>
-    `;
-  }
-
-  function logout() {
-    localStorage.removeItem('token');
-    alert('Anda telah logout.');
-    window.location.href = 'login.html';
-  }
-</script>
   <script>
     const API_URL = 'https://rifkira.psl17.my.id/api';
+    const header = document.getElementById('mainHeader');
+    const token = localStorage.getItem('token');
+    const email = localStorage.getItem('email');
+
+    // Cek login dan admin
+    if (!token) {
+      alert('Silakan login terlebih dahulu!');
+      window.location.href = 'login.html';
+    }
+
+    if (email === 'admin@mail.com') {
+      window.location.href = 'admin/dashboard.html';
+    }
+
+    // Atur header
+    if (token) {
+      header.innerHTML = `
+        <h1 class="text-2xl font-bold text-rose-700">Bellenshop</h1>
+        <nav class="flex gap-4 text-rose-600 font-medium">
+          <a href="index.html" class="nav-hover">Home</a>
+          <a href="keranjang.html" class="nav-hover">Keranjang</a>
+          <a href="wishlist.html" class="nav-hover">Favorit</a>
+          <a href="tentang.html" class="nav-hover">Tentang</a>
+          <button onclick="logout()" class="nav-hover text-red-500">Logout</button>
+        </nav>
+      `;
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('email');
+      alert('Anda telah logout.');
+      window.location.href = 'login.html';
+    }
+
     const cartContainer = document.getElementById('cartContainer');
     const subtotalAmount = document.getElementById('subtotalAmount');
     const subtotalContainer = document.getElementById('subtotalContainer');
@@ -118,7 +127,7 @@
       try {
         const res = await fetch(`${API_URL}/cart`, {
           headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
+            'Authorization': 'Bearer ' + token
           }
         });
 
@@ -167,7 +176,6 @@
         subtotalAmount.textContent = 'Rp' + total.toLocaleString('id-ID');
         pesanWA += `\nTotal: Rp${total.toLocaleString('id-ID')}`;
         checkoutBtn.href = `https://wa.me/6281234567890?text=${encodeURIComponent(pesanWA)}`;
-
       } catch (err) {
         cartContainer.innerHTML = `<p class="text-red-500">Gagal memuat keranjang: ${err.message}</p>`;
       }
@@ -179,7 +187,7 @@
         await fetch(`${API_URL}/cart/${id}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
+            'Authorization': 'Bearer ' + token
           }
         });
         loadKeranjang();
@@ -193,7 +201,7 @@
         await fetch(`${API_URL}/cart/${id}`, {
           method: 'PUT',
           headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            'Authorization': 'Bearer ' + token,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ qty: parseInt(qty) })
