@@ -7,6 +7,14 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://rifkira.psl17.my.id/js/app.js"></script>
   <script>
+  // Blokir admin agar tidak bisa mengakses index.html
+  const email = localStorage.getItem('email');
+  const token = localStorage.getItem('token');
+  if (token && email === 'admin@mail.com') {
+    window.location.replace('admin/dashboard.html');
+  }
+</script>
+  <script>
     tailwind.config = {
       theme: {
         extend: {
@@ -132,11 +140,13 @@
     `;
   }
 
-  function logout() {
-    localStorage.removeItem('token');
-    alert('Anda telah logout.');
-    window.location.href = 'login.html';
-  }
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('email');
+  alert('Anda telah logout.');
+  window.location.href = 'login.html';
+}
+
 </script>
   <script src="app.js"></script>
 </body>
