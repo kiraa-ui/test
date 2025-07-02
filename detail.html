@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Detail Produk - Bellenshop</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://rifkira.psl17.my.id/js/app.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -82,146 +81,157 @@
 </head>
 <body class="bg-gradient-to-br from-rose-100 via-pink-200 to-rose-300 min-h-screen">
 
+  <!-- Header -->
   <header id="mainHeader" class="sticky top-0 z-50 bg-white/70 backdrop-blur-lg shadow-md p-4 flex items-center justify-between animate-fade">
     <!-- Akan diganti via JS -->
   </header>
 
+  <!-- Detail Produk -->
   <main class="max-w-6xl mx-auto px-4 py-10 animate-fade">
     <div id="detailContainer" class="grid grid-cols-1 md:grid-cols-2 gap-12">
       <!-- Konten produk dinamis -->
     </div>
   </main>
 
+  <!-- Footer -->
   <footer class="bg-white/80 backdrop-blur-md text-center text-sm text-rose-500 py-6 shadow-inner animate-fade">
     &copy; 2025 Bellenshop. All rights reserved.
   </footer>
+
   <script>
-  const header = document.getElementById('mainHeader');
-  const token = localStorage.getItem('token');
+    const API_URL = 'https://rifkira.psl17.my.id/api';
+    const token = localStorage.getItem('token');
+    const email = localStorage.getItem('email');
+    const header = document.getElementById('mainHeader');
 
-  if (token) {
-    header.innerHTML = `
-      <h1 class="text-2xl font-bold text-rose-700">Bellenshop</h1>
-      <nav class="flex gap-4 text-rose-600 font-medium">
-        <a href="index.html" class="nav-hover">Home</a>
-        <a href="keranjang.html" class="nav-hover">Keranjang</a>
-        <a href="wishlist.html" class="nav-hover">Favorit</a>
-        <a href="tentang.html" class="nav-hover">Tentang</a>
-        <button onclick="logout()" class="nav-hover text-red-500">Logout</button>
-      </nav>
-    `;
-  } else {
-    header.innerHTML = `
-      <h1 class="text-2xl font-bold text-rose-700">Bellenshop</h1>
-      <nav class="flex gap-4 text-rose-600 font-medium">
-        <a href="index.html" class="nav-hover">Home</a>
-        <a href="tentang.html" class="nav-hover">Tentang</a>
-        <a href="login.html" class="nav-hover">Login</a>
-        <a href="register.html" class="nav-hover">Register</a>
-      </nav>
-    `;
-  }
+    // Redirect ke login jika belum login
+    if (!token) {
+      alert('Silakan login terlebih dahulu!');
+      window.location.href = 'login.html';
+    }
 
-  function logout() {
-    localStorage.removeItem('token');
-    alert('Anda telah logout.');
-    window.location.href = 'login.html';
-  }
-</script>
-    <script>
+    // Redirect admin ke dashboard
+    if (email === 'admin@mail.com') {
+      window.location.href = 'admin/dashboard.html';
+    }
+
+    // Tampilkan header sesuai login
+    if (token) {
+      header.innerHTML = `
+        <h1 class="text-2xl font-bold text-rose-700">Bellenshop</h1>
+        <nav class="flex gap-4 text-rose-600 font-medium">
+          <a href="index.html" class="nav-hover">Home</a>
+          <a href="keranjang.html" class="nav-hover">Keranjang</a>
+          <a href="wishlist.html" class="nav-hover">Favorit</a>
+          <a href="tentang.html" class="nav-hover">Tentang</a>
+          <button onclick="logout()" class="nav-hover text-red-500">Logout</button>
+        </nav>
+      `;
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('email');
+      alert('Anda telah logout.');
+      window.location.href = 'login.html';
+    }
+
     let currentProductId = null;
     let selectedQty = 1;
 
     async function loadDetail() {
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get('id');
-        if (!id) return detailContainer.innerHTML = '<p class="text-center">Produk tidak ditemukan.</p>';
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const detailContainer = document.getElementById('detailContainer');
+      if (!id) {
+        detailContainer.innerHTML = '<p class="text-center">Produk tidak ditemukan.</p>';
+        return;
+      }
 
-        try {
+      try {
         const res = await fetch(`${API_URL}/products/${id}`);
         const p = await res.json();
         currentProductId = p.id;
 
         detailContainer.innerHTML = `
-            <div>
+          <div>
             <img src="${p.image_url ? API_URL.replace('/api', '') + p.image_url : 'https://via.placeholder.com/500'}" class="rounded-3xl shadow-lg w-full object-cover" alt="${p.name}" />
-            </div>
-            <div>
+          </div>
+          <div>
             <h2 class="text-3xl md:text-4xl font-bold text-rose-800 mb-4">${p.name}</h2>
             <p class="text-gray-600 mb-4">${p.description}</p>
             ${p.discount_percentage ? `
-                <p class="line-through text-sm text-gray-400">Rp${Number(p.original_price).toLocaleString('id-ID')}</p>
-                <p class="text-xl font-bold text-rose-700 mb-2">Rp${Number(p.final_price).toLocaleString('id-ID')} 
+              <p class="line-through text-sm text-gray-400">Rp${Number(p.original_price).toLocaleString('id-ID')}</p>
+              <p class="text-xl font-bold text-rose-700 mb-2">Rp${Number(p.final_price).toLocaleString('id-ID')} 
                 <span class="bg-rose-100 text-rose-600 text-sm px-2 py-1 rounded-full ml-1">${p.discount_percentage}% OFF</span>
-                </p>
+              </p>
             ` : `
-                <p class="text-xl font-bold text-rose-700 mb-2">Rp${Number(p.price).toLocaleString('id-ID')}</p>
+              <p class="text-xl font-bold text-rose-700 mb-2">Rp${Number(p.price).toLocaleString('id-ID')}</p>
             `}
             <div class="flex gap-3 mt-4 items-center">
-                <label class="text-sm text-gray-600">Jumlah:</label>
-                <input id="qtyInput" type="number" value="1" min="1" class="w-20 text-center rounded-full px-4 py-2 bg-white shadow border border-pink-200 focus:outline-none" />
+              <label class="text-sm text-gray-600">Jumlah:</label>
+              <input id="qtyInput" type="number" value="1" min="1" class="w-20 text-center rounded-full px-4 py-2 bg-white shadow border border-pink-200 focus:outline-none" />
             </div>
             <button id="btnAddToCart"
-                class="mt-6 bg-pink-400 text-white px-6 py-3 rounded-full font-semibold shadow-lg btn-hover transition-all duration-300 hover:bg-pink-500">
-                Tambah ke Keranjang
+              class="mt-6 bg-pink-400 text-white px-6 py-3 rounded-full font-semibold shadow-lg btn-hover transition-all duration-300 hover:bg-pink-500">
+              Tambah ke Keranjang
             </button>
-            </div>
+          </div>
         `;
 
-        setTimeout(setupCartLogic, 100); // tunggu konten muncul
-        } catch (err) {
+        setTimeout(setupCartLogic, 100);
+      } catch (err) {
         detailContainer.innerHTML = `<p class="text-red-500">Gagal mengambil detail produk: ${err.message}</p>`;
-        }
+      }
     }
 
     function setupCartLogic() {
-        const btn = document.getElementById('btnAddToCart');
-        const qtyInput = document.getElementById('qtyInput');
+      const btn = document.getElementById('btnAddToCart');
+      const qtyInput = document.getElementById('qtyInput');
 
-        if (!btn || !qtyInput) return;
+      if (!btn || !qtyInput) return;
 
-        qtyInput.addEventListener('change', () => {
+      qtyInput.addEventListener('change', () => {
         selectedQty = parseInt(qtyInput.value) || 1;
-        });
+      });
 
-        btn.addEventListener('click', async () => {
+      btn.addEventListener('click', async () => {
         if (!currentProductId || !selectedQty) return;
 
         try {
-            const res = await fetch(`${API_URL}/cart`, {
+          const res = await fetch(`${API_URL}/cart`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-          },
-          body: JSON.stringify({
-            id_produk: currentProductId,
-            qty: selectedQty
-          })
-        });
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+              id_produk: currentProductId,
+              qty: selectedQty
+            })
+          });
 
-        const result = await res.json();
+          const result = await res.json();
 
-        if (res.ok) {
-          btn.innerText = '✔️ Ditambahkan!';
-          btn.classList.remove('bg-pink-400');
-          btn.classList.add('bg-green-400');
-          setTimeout(() => {
-            btn.innerText = 'Tambah ke Keranjang';
-            btn.classList.remove('bg-green-400');
-            btn.classList.add('bg-pink-400');
-          }, 1500);
-        } else {
-          alert(result.error || 'Gagal menambahkan produk.');
+          if (res.ok) {
+            btn.innerText = '✔️ Ditambahkan!';
+            btn.classList.remove('bg-pink-400');
+            btn.classList.add('bg-green-400');
+            setTimeout(() => {
+              btn.innerText = 'Tambah ke Keranjang';
+              btn.classList.remove('bg-green-400');
+              btn.classList.add('bg-pink-400');
+            }, 1500);
+          } else {
+            alert(result.error || 'Gagal menambahkan produk.');
+          }
+        } catch (err) {
+          alert('Gagal menambahkan ke keranjang: ' + err.message);
         }
-      } catch (err) {
-        alert('Gagal menambahkan ke keranjang: ' + err.message);
-      }
-    });
-  }
+      });
+    }
 
-  document.addEventListener('DOMContentLoaded', loadDetail);
-</script>
-
+    document.addEventListener('DOMContentLoaded', loadDetail);
+  </script>
 </body>
 </html>
