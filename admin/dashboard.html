@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard Admin - Produk</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://rifkira.psl17.my.id/js/app.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -32,9 +31,7 @@
     };
   </script>
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-    }
+    body { font-family: 'Poppins', sans-serif; }
     .btn-hover {
       transition: all 0.3s ease-in-out;
     }
@@ -43,9 +40,7 @@
       background-color: #f472b6;
       color: white;
     }
-    .modal {
-      background-color: rgba(0, 0, 0, 0.6);
-    }
+    .modal { background-color: rgba(0, 0, 0, 0.6); }
   </style>
 </head>
 <body class="bg-gradient-to-br from-rose-100 via-pink-200 to-rose-300 min-h-screen">
@@ -62,7 +57,6 @@
         + Tambah Produk
       </button>
     </div>
-
     <div id="produkList" class="grid sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
   </main>
 
@@ -72,38 +66,16 @@
       <button onclick="closeModal('addModal')" class="absolute top-2 right-2 text-rose-500 font-bold">&times;</button>
       <h3 class="text-lg font-semibold text-rose-700 mb-4">Tambah Produk</h3>
       <form id="addProductForm" class="space-y-4">
-        <input type="text" name="name" placeholder="Nama Produk" class="w-full p-3 rounded-lg shadow border border-rose-200" required>
-        <textarea name="description" placeholder="Deskripsi" class="w-full p-3 rounded-lg shadow border border-rose-200" required></textarea>
-        <input type="number" name="price" placeholder="Harga" class="w-full p-3 rounded-lg shadow border border-rose-200" required>
-        <input type="text" name="size" placeholder="Ukuran" class="w-full p-3 rounded-lg shadow border border-rose-200">
-        <input type="text" name="color" placeholder="Warna" class="w-full p-3 rounded-lg shadow border border-rose-200">
-        <input type="text" name="category" placeholder="Kategori" class="w-full p-3 rounded-lg shadow border border-rose-200">
-        <input type="file" name="image" class="w-full p-3 rounded-lg shadow border border-rose-200">
+        <input type="text" name="name" placeholder="Nama Produk" class="w-full p-3 rounded-lg shadow border" required>
+        <textarea name="description" placeholder="Deskripsi" class="w-full p-3 rounded-lg shadow border" required></textarea>
+        <input type="number" name="price" placeholder="Harga" class="w-full p-3 rounded-lg shadow border" required>
+        <input type="text" name="size" placeholder="Ukuran" class="w-full p-3 rounded-lg shadow border">
+        <input type="text" name="color" placeholder="Warna" class="w-full p-3 rounded-lg shadow border">
+        <input type="text" name="category" placeholder="Kategori" class="w-full p-3 rounded-lg shadow border">
+        <input type="file" name="image" class="w-full p-3 rounded-lg shadow border">
         <div id="addProductResponse" class="text-sm text-rose-500"></div>
-        <button class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg btn-hover" type="submit">
+        <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg btn-hover">
           Simpan Produk
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Edit Produk -->
-  <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center modal">
-    <div class="bg-white rounded-xl p-6 max-w-xl w-full relative animate-fade">
-      <button onclick="closeModal('editModal')" class="absolute top-2 right-2 text-rose-500 font-bold">&times;</button>
-      <h3 class="text-lg font-semibold text-rose-700 mb-4">Edit Produk</h3>
-      <form id="editProductForm" class="space-y-4">
-        <input type="hidden" name="id">
-        <input type="text" name="name" placeholder="Nama Produk" class="w-full p-3 rounded-lg shadow border border-rose-200" required>
-        <textarea name="description" placeholder="Deskripsi" class="w-full p-3 rounded-lg shadow border border-rose-200" required></textarea>
-        <input type="number" name="price" placeholder="Harga" class="w-full p-3 rounded-lg shadow border border-rose-200" required>
-        <input type="text" name="size" placeholder="Ukuran" class="w-full p-3 rounded-lg shadow border border-rose-200">
-        <input type="text" name="color" placeholder="Warna" class="w-full p-3 rounded-lg shadow border border-rose-200">
-        <input type="text" name="category" placeholder="Kategori" class="w-full p-3 rounded-lg shadow border border-rose-200">
-        <input type="file" name="image" class="w-full p-3 rounded-lg shadow border border-rose-200">
-        <div id="editProductResponse" class="text-sm text-rose-500"></div>
-        <button class="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-3 rounded-full font-semibold shadow-lg btn-hover" type="submit">
-          Update Produk
         </button>
       </form>
     </div>
@@ -114,14 +86,92 @@
   </footer>
 
   <script>
+    const API_URL = 'https://rifkira.psl17.my.id/api';
+    const token = localStorage.getItem('token');
+    const email = localStorage.getItem('email');
+
+    if (!token || email !== 'admin@mail.com') {
+      alert("Akses ditolak. Login sebagai admin.");
+      window.location.href = 'login.html';
+    }
+
+    const produkList = document.getElementById('produkList');
+
+    async function loadProduk() {
+      try {
+        const res = await fetch(`${API_URL}/products`, {
+          headers: { Authorization: 'Bearer ' + token }
+        });
+        const data = await res.json();
+        produkList.innerHTML = data.map(p => `
+          <div class="bg-white/80 p-4 rounded-xl shadow">
+            <img src="${p.image_url ? API_URL.replace('/api', '') + p.image_url : 'https://via.placeholder.com/300'}"
+              class="rounded-xl mb-3 w-full h-48 object-cover" />
+            <h4 class="font-bold text-lg text-rose-700">${p.name}</h4>
+            <p class="text-sm text-gray-600 mb-2">Rp${Number(p.price).toLocaleString('id-ID')}</p>
+            <div class="flex justify-between gap-2">
+              <button onclick="editProduk(${p.id})" class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-1 rounded-full text-sm">Edit</button>
+              <button onclick="hapusProduk(${p.id})" class="bg-red-400 hover:bg-red-500 text-white px-4 py-1 rounded-full text-sm">Hapus</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        produkList.innerHTML = `<p class="text-red-500">Gagal memuat produk: ${err.message}</p>`;
+      }
+    }
+
+    document.getElementById('addProductForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      try {
+        const res = await fetch(`${API_URL}/products`, {
+          method: 'POST',
+          headers: { Authorization: 'Bearer ' + token },
+          body: formData
+        });
+        const result = await res.json();
+        document.getElementById('addProductResponse').textContent = res.ok ? 'Produk berhasil ditambahkan' : (result.error || 'Gagal tambah produk');
+        if (res.ok) {
+          closeModal('addModal');
+          loadProduk();
+          form.reset();
+        }
+      } catch (err) {
+        document.getElementById('addProductResponse').textContent = 'Gagal: ' + err.message;
+      }
+    });
+
+    async function hapusProduk(id) {
+      if (!confirm('Yakin ingin menghapus produk ini?')) return;
+      try {
+        await fetch(`${API_URL}/products/${id}`, {
+          method: 'DELETE',
+          headers: { Authorization: 'Bearer ' + token }
+        });
+        loadProduk();
+      } catch (err) {
+        alert('Gagal menghapus: ' + err.message);
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('email');
+      window.location.href = 'login.html';
+    }
+
     function openModal(id) {
       document.getElementById(id).classList.remove('hidden');
       document.getElementById(id).classList.add('flex');
     }
+
     function closeModal(id) {
       document.getElementById(id).classList.remove('flex');
       document.getElementById(id).classList.add('hidden');
     }
+
+    document.addEventListener('DOMContentLoaded', loadProduk);
   </script>
 </body>
 </html>
