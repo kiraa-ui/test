@@ -88,6 +88,119 @@
       tabLogin.classList.add('bg-rose-100', 'text-rose-600');
     });
   </script>
-  <script src="https://rifkira.psl17.my.id/js/app.js"></script>
+<!-- Toast Notification -->
+<div id="toast" class="fixed top-4 right-4 z-50 hidden bg-rose-500 text-white px-4 py-2 rounded shadow-lg animate-fade"></div>
+
+<script>
+  const API_URL = 'https://rifkira.psl17.my.id/api';
+
+  function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.remove('hidden');
+    toast.classList.remove('bg-rose-500', 'bg-green-500');
+    toast.classList.add(isError ? 'bg-rose-500' : 'bg-green-500');
+
+    setTimeout(() => {
+      toast.classList.add('hidden');
+    }, 3000);
+  }
+
+  // VALIDASI EMAIL
+  function isValidEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  }
+
+  // ========== LOGIN ==========
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(this));
+
+      // Validasi
+      if (!isValidEmail(data.email)) {
+        showToast('Format email tidak valid', true);
+        return;
+      }
+      if (!data.password || data.password.length < 6) {
+        showToast('Password minimal 6 karakter', true);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+
+        if (res.ok && result.token) {
+          localStorage.setItem('token', result.token);
+          localStorage.setItem('email', data.email.toLowerCase());
+          showToast('Login berhasil');
+
+          setTimeout(() => {
+            if (data.email.toLowerCase() === 'admin@mail.com') {
+              window.location.href = 'admin/dashboard.html';
+            } else {
+              window.location.href = 'index.html';
+            }
+          }, 1000);
+        } else {
+          showToast(result.error || 'Login gagal', true);
+        }
+      } catch (err) {
+        showToast('Server error: ' + err.message, true);
+      }
+    });
+  }
+
+  // ========== REGISTER ==========
+  const registerForm = document.getElementById('registerForm');
+  if (registerForm) {
+    registerForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(this));
+
+      // Validasi
+      if (!data.name || data.name.length < 3) {
+        showToast('Nama minimal 3 karakter', true);
+        return;
+      }
+      if (!isValidEmail(data.email)) {
+        showToast('Format email tidak valid', true);
+        return;
+      }
+      if (!data.password || data.password.length < 6) {
+        showToast('Password minimal 6 karakter', true);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          showToast(result.message || 'Registrasi berhasil');
+          registerForm.reset();
+        } else {
+          showToast(result.error || 'Gagal mendaftar', true);
+        }
+      } catch (err) {
+        showToast('Server error: ' + err.message, true);
+      }
+    });
+  }
+</script>
+
 </body>
 </html>
